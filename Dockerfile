@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.18-alpine3.16
+ARG BASE=cr.loongnix.cn/library/golang:1.19-alpine
 FROM ${BASE} AS builder
 
 ARG ADD_BUILD_TAGS=""
@@ -27,13 +27,17 @@ RUN apk add --update --no-cache ${ALPINE_PKG_BASE} ${ALPINE_PKG_EXTRA}
 
 WORKDIR /device-rest-go
 
+ENV GO111MODULE=auto GOPROXY=https://goproxy.cn,direct
+
 COPY go.mod vendor* ./
-RUN [ ! -d "vendor" ] && go mod download all || echo "skipping..."
 
 COPY . .
+
+RUN go mod tidy
+
 RUN $MAKE
 
-FROM alpine:3.16
+FROM cr.loongnix.cn/library/alpine:3.11
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
   copyright='Copyright (c) 2022: Intel'

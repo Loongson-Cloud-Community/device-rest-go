@@ -17,4 +17,4 @@
 package device_rest
 
 // Global version for device-sdk-go
-var Version string = "to be replaced by makefile"
+var Version string = "3.0.0"

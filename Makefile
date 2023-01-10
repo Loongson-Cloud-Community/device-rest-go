@@ -1,7 +1,7 @@
 .PHONY: build test unittest lint clean prepare update docker
 
-GO=CGO_ENABLED=0 GO111MODULE=on go
-GOCGO=CGO_ENABLED=1 GO111MODULE=on go
+GO=CGO_ENABLED=0 GO111MODULE=auto go
+GOCGO=CGO_ENABLED=1 GO111MODULE=auto go
 
 # see https://shibumi.dev/posts/hardening-executables
 CGO_CPPFLAGS="-D_FORTIFY_SOURCE=2"
@@ -18,11 +18,11 @@ ARCH=$(shell uname -m)
 DOCKERS=docker_device_rest_go
 .PHONY: $(DOCKERS)
 
-VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
+VERSION=3.0.0
 
 GIT_SHA=$(shell git rev-parse HEAD)
-GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-rest-go.Version=$(VERSION)" -trimpath -mod=readonly
-CGOFLAGS=-ldflags "-linkmode=external -X github.com/edgexfoundry/device-rest-go.Version=$(VERSION)" -trimpath -mod=readonly -buildmode=pie
+GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-rest-go.Version=$(VERSION)" -trimpath -mod=mod
+CGOFLAGS=-ldflags "-linkmode=external -X github.com/edgexfoundry/device-rest-go.Version=$(VERSION)" -trimpath -mod=mod
 
 build: $(MICROSERVICES)
 
@@ -64,6 +64,7 @@ docker_device_rest_go:
 		--label "git_sha=$(GIT_SHA)" \
 		-t edgexfoundry/device-rest:$(GIT_SHA) \
 		-t edgexfoundry/device-rest:$(VERSION)-dev \
+		-t cr.loongnix.cn/edgexfoundry/device-rest:$(VERSION) \
 		.
 
 docker-nats:
